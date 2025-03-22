@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import {handleExtractToTrCommand} from "./src/handleExtractToTrCommand";
 import {TrCodeActionProvider} from "./src/TrCodeActionProvider";
 import {initSlangGen} from "./src/initSlangGen";
+import * as utils from "./src/utils";
 
 export const InitCommand_Id = "extension.init";
 export const ExtractCommand_Id = "extension.extractToTr";
@@ -16,8 +17,7 @@ export function logToOut(str: string) {
 
 export function activate(context: vscode.ExtensionContext) {
   outPut = vscode.window.createOutputChannel("Slang Gen");
-
-  outPut.appendLine("Slang Gen Extension activated.");
+  logToOut("Slang Gen Extension activated.");
 
   context.subscriptions.push(
     vscode.commands.registerCommand(InitCommand_Id, initSlangGen),

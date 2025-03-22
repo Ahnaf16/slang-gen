@@ -4,7 +4,6 @@ import * as utils from "./utils";
 import {camelCase} from "text-case";
 import {exec} from "child_process";
 import {logToOut} from "../extension";
-import {log} from "console";
 
 export async function handleExtractToTrCommand(
   document: vscode.TextDocument,
