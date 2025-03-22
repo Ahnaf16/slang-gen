@@ -9,7 +9,7 @@ export async function handleExtractToTrCommand(
   document: vscode.TextDocument,
   range: vscode.Range,
 ) {
-  const hasSlang = utils.usesSlangPackage();
+  const hasSlang = utils.checkForSlangPackage();
 
   if (!hasSlang) {
     return;

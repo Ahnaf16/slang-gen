@@ -3,31 +3,52 @@ import * as vscode from "vscode";
 import * as yaml from "yaml";
 import {logToOut} from "../extension";
 
-export function usesSlangPackage(): boolean {
-  const pubspecPath =
+export function hasPubspec(): {
+  exists: boolean;
+  pubPath: string;
+} {
+  const path =
     vscode.workspace.workspaceFolders?.[0]?.uri.fsPath + "/pubspec.yaml";
+  const exist = existsSync(path);
+  return {exists: exist, pubPath: path};
+}
 
-  if (!existsSync(pubspecPath)) {
-    showError("pubspec.yaml file not found.");
-    return false;
-  }
-
+export function hasDependency(
+  pubPath: string,
+  dependency: string,
+  isDev: boolean = false,
+): boolean {
   try {
-    const pubspecFile = readFileSync(pubspecPath, "utf8");
+    const pubContent = readFileSync(pubPath, "utf8");
 
-    const parsedYaml = yaml.parse(pubspecFile);
+    const parsedYaml = yaml.parse(pubContent);
 
-    const dependencies = parsedYaml.dependencies || {};
+    const dependencies =
+      (isDev ? parsedYaml.dev_dependencies : parsedYaml.dependencies) || {};
 
-    if (dependencies["slang"]) {
+    if (dependencies[dependency]) {
       return true;
     } else {
-      showError("Slang package is not found in dependencies.");
       return false;
     }
   } catch (error) {
     logToOut(`Error reading or parsing pubspec.yaml:\n${error}`);
-    showError(`Error parsing pubspec.yaml`);
+    return false;
+  }
+}
+
+export function checkForSlangPackage(): boolean {
+  const {exists, pubPath} = hasPubspec();
+
+  if (!exists) {
+    showError("pubspec.yaml file not found.");
+    return false;
+  }
+  const hasSlang = hasDependency(pubPath, "slang");
+  if (hasSlang) {
+    return true;
+  } else {
+    showError("Slang package is not found in dependencies.");
     return false;
   }
 }
@@ -79,10 +100,6 @@ export async function findFiles(
   );
 
   return fileUrls;
-}
-
-export function containsDartVariables(innerText: string): boolean {
-  return /\$\w+|\$\{[^}]+\}/.test(innerText);
 }
 
 export function extractStringAtRange(

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import {ACTION_TITLE, ExtractCommand_Id} from "../extension";
-import {extractStringAtRange, usesSlangPackage} from "./utils";
+import {ACTION_TITLE, ExtractCommand} from "../extension";
+import {extractStringAtRange, checkForSlangPackage} from "./utils";
 
 export class TrCodeActionProvider implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
@@ -17,7 +17,7 @@ export class TrCodeActionProvider implements vscode.CodeActionProvider {
       return;
     }
 
-    const hasSlang = usesSlangPackage();
+    const hasSlang = checkForSlangPackage();
     if (!hasSlang) {
       return;
     }
@@ -28,7 +28,7 @@ export class TrCodeActionProvider implements vscode.CodeActionProvider {
     );
     action.command = {
       title: ACTION_TITLE,
-      command: ExtractCommand_Id,
+      command: ExtractCommand,
       arguments: [document, range],
     };
 

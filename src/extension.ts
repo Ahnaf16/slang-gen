@@ -2,10 +2,9 @@ import * as vscode from "vscode";
 import {handleExtractToTrCommand} from "./src/handleExtractToTrCommand";
 import {TrCodeActionProvider} from "./src/TrCodeActionProvider";
 import {initSlangGen} from "./src/initSlangGen";
-import * as utils from "./src/utils";
 
 export const InitCommand_Id = "extension.init";
-export const ExtractCommand_Id = "extension.extractToTr";
+export const ExtractCommand = "extension.extractToTr";
 export const ACTION_TITLE = "Extract to Tr";
 const SUPPORTED_LANGUAGE = "dart";
 
@@ -21,10 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(InitCommand_Id, initSlangGen),
-    vscode.commands.registerCommand(
-      ExtractCommand_Id,
-      handleExtractToTrCommand,
-    ),
+    vscode.commands.registerCommand(ExtractCommand, handleExtractToTrCommand),
 
     vscode.languages.registerCodeActionsProvider(
       {scheme: "file", language: SUPPORTED_LANGUAGE},
