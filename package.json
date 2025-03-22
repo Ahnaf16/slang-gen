@@ -1,7 +1,7 @@
 {
   "name": "slang-gen",
   "displayName": "Slang Gen",
-  "description": "Genaretor and helper utility for dart slang package",
+  "description": "Generator and helper utility for dart slang package",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.98.0"
@@ -9,15 +9,45 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:dart"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "slang-gen.helloWorld",
-        "title": "Hello World"
+        "command": "extension.extractToTr",
+        "title": "Extract to Tr",
+        "when": "!config.hideExtractToTr"
+      },
+      {
+        "command": "extension.init",
+        "title": "Initialize Slang Gen"
       }
-    ]
+    ],
+    "codeActions": [
+      {
+        "language": "dart",
+        "kind": "quickfix",
+        "title": "Extract to Tr"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Slang Gen Settings",
+      "properties": {
+        "slangGen.hideExtractToTr": {
+          "type": "boolean",
+          "default": true,
+          "description": "Do not change this setting. This does not work from Commands Palette."
+        },
+        "slangGen.useContext": {
+          "type": "boolean",
+          "default": false,
+          "description": "use Tr.of(context).text instead of t.text"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -28,14 +58,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.98.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.98.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
-    "eslint": "^9.21.0",
-    "typescript": "^5.7.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.21.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "text-case": "^1.0.9",
+    "yaml": "^2.7.0"
   }
 }
