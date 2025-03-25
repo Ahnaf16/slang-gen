@@ -13,6 +13,9 @@ let outPut: vscode.OutputChannel;
 export function logToOut(str: string) {
   outPut.appendLine(str);
 }
+export function clearOutput() {
+  outPut.clear();
+}
 
 export function activate(context: vscode.ExtensionContext) {
   outPut = vscode.window.createOutputChannel("Slang Gen");

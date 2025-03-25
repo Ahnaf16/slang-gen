@@ -1,25 +1,47 @@
-import {readFileSync, existsSync} from "fs";
+import * as fs from "fs/promises";
 import * as vscode from "vscode";
 import * as yaml from "yaml";
 import {logToOut} from "../extension";
+import * as path from "path";
 
-export function hasPubspec(): {
-  exists: boolean;
-  pubPath: string;
-} {
-  const path =
-    vscode.workspace.workspaceFolders?.[0]?.uri.fsPath + "/pubspec.yaml";
-  const exist = existsSync(path);
-  return {exists: exist, pubPath: path};
+export function tryGetWorkspaceRoot(): string | undefined {
+  const folders = vscode.workspace.workspaceFolders;
+  if (!folders || folders.length === 0) {
+    return undefined;
+  }
+  return folders[0].uri.fsPath;
 }
 
-export function hasDependency(
+export function getWorkspaceRoot(): string {
+  const root = tryGetWorkspaceRoot();
+  if (!root) {
+    throw new Error("No workspace folder is open.");
+  }
+  return root;
+}
+
+export async function hasPubspec(): Promise<{
+  exists: boolean;
+  pubPath: string;
+}> {
+  const workspaceRoot = getWorkspaceRoot();
+  const pubPath = path.join(workspaceRoot, "pubspec.yaml");
+
+  try {
+    await fs.access(pubPath);
+    return {exists: true, pubPath};
+  } catch {
+    return {exists: false, pubPath};
+  }
+}
+
+export async function hasDependency(
   pubPath: string,
   dependency: string,
   isDev: boolean = false,
-): boolean {
+): Promise<boolean> {
   try {
-    const pubContent = readFileSync(pubPath, "utf8");
+    const pubContent = await fs.readFile(pubPath, "utf8");
 
     const parsedYaml = yaml.parse(pubContent);
 
@@ -37,14 +59,14 @@ export function hasDependency(
   }
 }
 
-export function checkForSlangPackage(): boolean {
-  const {exists, pubPath} = hasPubspec();
+export async function checkForSlangPackage(): Promise<boolean> {
+  const {exists, pubPath} = await hasPubspec();
 
   if (!exists) {
     showError("pubspec.yaml file not found.");
     return false;
   }
-  const hasSlang = hasDependency(pubPath, "slang");
+  const hasSlang = await hasDependency(pubPath, "slang");
   if (hasSlang) {
     return true;
   } else {
@@ -53,28 +75,53 @@ export function checkForSlangPackage(): boolean {
   }
 }
 
-export async function slangConfig(): Promise<{
-  translate_var: string;
-  class_name: string;
-  string_interpolation: string;
-} | null> {
-  const files = await findFiles("**/slang.yaml", 1);
-  if (files.length === 0) {
-    return null;
-  }
+export async function slangConfig(): Promise<SlangConfig> {
+  const slangUri = path.join(getWorkspaceRoot(), "slang.yaml");
 
-  const slangUri = files[0];
   try {
-    const content = readFileSync(slangUri.fsPath, "utf8");
+    const content = await readOrCreateFile(slangUri, defaultContent);
     const parsed = yaml.parse(content);
     return {
       translate_var: parsed.translate_var,
       class_name: parsed.class_name,
       string_interpolation: parsed.string_interpolation,
+      input: parsed.input_directory,
+      input_pattern: parsed.input_file_pattern,
     };
   } catch (err) {
-    console.error("Failed to read slang.yaml:", err);
-    return null;
+    logToOut(`Failed to read slang.yaml:\n${err}`);
+    return yaml.parse(defaultContent);
+  }
+}
+
+export async function readOrCreateFile(
+  filePath: string,
+  defaultContent: string,
+): Promise<string> {
+  try {
+    const content = await fs.readFile(filePath, "utf8");
+    return content;
+  } catch (err: any) {
+    if (err.code === "ENOENT") {
+      // File doesn't exist, so create it
+      logToOut(`Creating file: ${filePath}`);
+      await createFile(filePath, defaultContent);
+      return defaultContent;
+    } else {
+      logToOut(`Error reading file: ${filePath}.\n${err}`);
+      throw err;
+    }
+  }
+}
+
+export async function createFile(filePath: string, content: string) {
+  try {
+    const dir = path.dirname(filePath);
+    await fs.mkdir(dir, {recursive: true});
+    await fs.writeFile(filePath, content, "utf8");
+  } catch (err) {
+    logToOut(`Error creating file: ${filePath}.\n${err}`);
+    throw err;
   }
 }
 
@@ -136,3 +183,26 @@ export function extractStringAtRange(
 
   return undefined;
 }
+
+export interface SlangConfig {
+  translate_var: string;
+  class_name: string;
+  string_interpolation: string;
+  input: string;
+  input_pattern: string;
+}
+
+const defaultContent = `base_locale: en
+fallback_strategy: base_locale
+input_directory: lib/_core/i18n
+input_file_pattern: .i18n.json
+output_directory: lib/_core/i18n
+output_file_name: translations.dart
+translate_var: t
+enum_name: AppLocale
+class_name: Tr
+string_interpolation: dart
+format:
+  enabled: true
+  width: 120
+`;

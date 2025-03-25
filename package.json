@@ -23,6 +23,14 @@
       {
         "command": "extension.init",
         "title": "Initialize Slang Gen"
+      },
+      {
+        "command": "extension.addLocal",
+        "title": "Add new i18n.json"
+      },
+      {
+        "command": "extension.removeLocal",
+        "title": "remove a i18n.json"
       }
     ],
     "codeActions": [

@@ -2,22 +2,16 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as utils from "./utils";
 import {camelCase} from "text-case";
-import {exec} from "child_process";
 import {logToOut} from "../extension";
+import * as cmd from "./commands";
 
 export async function handleExtractToTrCommand(
   document: vscode.TextDocument,
   range: vscode.Range,
 ) {
-  const hasSlang = utils.checkForSlangPackage();
+  const hasSlang = await utils.checkForSlangPackage();
 
   if (!hasSlang) {
-    return;
-  }
-
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-  if (!workspaceFolder) {
-    utils.showError("No workspace folder found.");
     return;
   }
 
@@ -25,8 +19,8 @@ export async function handleExtractToTrCommand(
   const config = await utils.slangConfig();
 
   const useContext = exConfig.get("useContext");
-  const translateVar = config?.translate_var ?? "t";
-  const className = config?.class_name ?? "Translation";
+  const translateVar = config.translate_var;
+  const className = config.class_name;
 
   const stringInfo = utils.extractStringAtRange(document, range);
 
@@ -62,8 +56,6 @@ export async function handleExtractToTrCommand(
   edit.replace(document.uri, new vscode.Range(startPos, endPos), replaced);
   await vscode.workspace.applyEdit(edit);
 
-  const cwd = workspaceFolder.uri.fsPath;
-
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -71,7 +63,7 @@ export async function handleExtractToTrCommand(
       cancellable: false,
     },
     async (p) => {
-      return new Promise<void>(async (resolve, reject) => {
+      return new Promise(async (resolve, reject) => {
         const trFiles = await utils.findFiles("**/i18n/*.i18n.json");
 
         if (trFiles.length === 0) {
@@ -85,32 +77,26 @@ export async function handleExtractToTrCommand(
         for (const trFile of trFiles) {
           const content = JSON.parse(fs.readFileSync(trFile.fsPath, "utf8"));
           content[trKey] = trValue;
-          fs.writeFileSync(trFile.fsPath, JSON.stringify(content, null, 2));
+          await utils.createFile(
+            trFile.fsPath,
+            JSON.stringify(content, null, 2),
+          );
           logToOut(`Added ${userInput} to ${trFile.fsPath}`);
         }
 
         p.report({message: "Generating localization files..."});
 
-        exec("dart run slang", {cwd}, (error, stdout, stderr) => {
-          if (error) {
+        await cmd.runSlangGen(
+          (_) => {
+            p.report({message: "Localization files generated successfully."});
+            resolve(_);
+          },
+          (error) => {
             p.report({message: "Failed to generate localization files."});
-            logToOut(error.message);
-            logToOut(error.stack ?? "");
             reject(error);
             return;
-          }
-
-          if (stderr) {
-            p.report({message: "Failed to generate localization files."});
-            logToOut(stderr);
-            reject(new Error(stderr));
-            return;
-          }
-
-          p.report({message: "Localization files generated successfully."});
-          logToOut(stdout);
-          resolve();
-        });
+          },
+        );
       });
     },
   );
