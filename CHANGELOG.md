@@ -9,3 +9,7 @@ All notable changes to the "slang-gen" extension will be documented in this file
 ## [0.0.2]
 
 - updated readme
+
+## [0.0.3]
+
+- updated icon

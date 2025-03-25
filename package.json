@@ -2,12 +2,13 @@
   "name": "slang-gen",
   "displayName": "Slang Gen",
   "description": "String extractor and helper utility for dart slang package",
+  "icon": "assets/icon.png",
   "publisher": "marj-tools",
   "repository": {
     "type": "git",
     "url": "https://github.com/Ahnaf16/slang-gen"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.98.0"
   },
