@@ -1,71 +1,104 @@
-# slang-gen README
+# Slang Gen: Flutter i18n Extractor for Slang
 
-This is the README for your extension "slang-gen". After writing up a brief description, we recommend including the following sections.
+A handy VS Code extension that helps Flutter developers **extract internationalized strings directly from their codebase** and add them to all `i18n` files.
 
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+This extension is a companion to the [slang](https://pub.dev/packages/slang) packages.
 
 ---
 
-## Following extension guidelines
+## ✨ Features
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+- ✅ **Extract i18n Strings**  
+  Put the cursor on any string in a Dart file and extract it to your `i18n` files in one click.  
+  The extension updates all locale files automatically.
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- 🔍 **Auto-detect Variables**: Automatically detects embedded variables in strings  
 
-## Working with Markdown
+- ⚙️ **Slang Initialization Command**  
+  Quickly scaffold the `slang` dependency and configuration files (`slang.yaml`, translations, etc.) in your Flutter app.
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+---
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+## 🛠️ Usage
 
-## For more information
+### 🏗️ Initialize Slang i18n
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+1. Open the command palette: `Ctrl + Shift + P` (or `Cmd + Shift + P` on macOS).
+2. Run: `Slang Gen : Initialize`.
+3. This will:
+   - Add `slang`, `slang_flutter` and `slang_build_runner` to your `pubspec.yaml`
+   - Create a basic `slang.yaml` config file
+   - Generate the initial `i18n` files (`str_en.i18n.json`)
 
-**Enjoy!**
+### 🔤 Extract Strings to i18n
+
+1. Place the cursor on a hardcoded string in a Dart file. eg. `"Hello World"` or `"Hello ${name}"`.
+2. Click the **light bulb icon** (`💡`) or press `Ctrl+.` to open quick fixes.
+3. Select **"Extract to Tr"**.
+4. This will:
+   - Prompts to update the translation key if needed (e.g., `helloWorld`)
+   - Moves the string to all `i18n.json` files.
+   - Replaces the string in code with `t.helloWorld` or `Tr.of(context).helloWorld`.
+
+5. This also works with strings with variables. eg. `"Hello ${name}"` will be replaced with `t.hello(name:name)` or `Tr.of(context).hello(name:name)`
+
+## 🔧 Extension Settings
+
+This extension provides configuration options under `extractToTr`:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `slangGen.useContext` | `false` | if true, use `Tr.of(context)` |
+
+---
+
+## 📦 Requirements
+
+- Your project must contain a `pubspec.yaml` file.
+- The `slang` dependencies (added automatically by this extension)
+
+---
+
+## 📁 File Structure Example
+
+```txt
+lib/
+    └── main.dart
+    └── i18n/
+        ├── str_en.i18n.json
+        ├── str_es.i18n.json
+        └── ...
+slang.yaml
+pubspec.yaml
+```
+
+---
+
+## 📌 Extension Commands
+
+| Command | Description |
+|--------|-------------|
+| `Slang Gen : Initialize` | Set up `slang` in your Flutter project |
+| `Extract to Tr` | Converts a hardcoded string into a Slang translation |
+
+---
+
+## ⚠️ Troubleshooting
+
+- **Extension not working?**  
+  - Ensure `pubspec.yaml` exists in the root of your workspace.  
+  - Check the **Output** tab for logs (`View > Output > Extract to Tr`).
+
+## 🤝 Contributions
+
+Pull requests, suggestions, and feedback are welcome! Help improve this extension for all Flutter developers around the world. 🌐
+
+---
+
+## 📃 License
+
+MIT License
+
+---
+
+Built with ❤️ for Flutter devs.

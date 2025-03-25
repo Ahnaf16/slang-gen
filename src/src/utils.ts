@@ -193,9 +193,9 @@ export interface SlangConfig {
 
 const defaultContent = `base_locale: en
 fallback_strategy: base_locale
-input_directory: lib/_core/i18n
+input_directory: lib/i18n
 input_file_pattern: .i18n.json
-output_directory: lib/_core/i18n
+output_directory: lib/i18n
 output_file_name: translations.dart
 translate_var: t
 enum_name: AppLocale

@@ -1,7 +1,12 @@
 {
   "name": "slang-gen",
   "displayName": "Slang Gen",
-  "description": "Generator and helper utility for dart slang package",
+  "description": "String extractor and helper utility for dart slang package",
+  "publisher": "marj-tools",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ahnaf16/slang-gen"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.98.0"
@@ -22,15 +27,7 @@
       },
       {
         "command": "extension.init",
-        "title": "Initialize Slang Gen"
-      },
-      {
-        "command": "extension.addLocal",
-        "title": "Add new i18n.json"
-      },
-      {
-        "command": "extension.removeLocal",
-        "title": "remove a i18n.json"
+        "title": "Slang Gen : Initialize"
       }
     ],
     "codeActions": [
