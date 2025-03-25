@@ -103,7 +103,6 @@ export async function readOrCreateFile(
     return content;
   } catch (err: any) {
     if (err.code === "ENOENT") {
-      // File doesn't exist, so create it
       logToOut(`Creating file: ${filePath}`);
       await createFile(filePath, defaultContent);
       return defaultContent;
