@@ -17,7 +17,7 @@ export class TrCodeActionProvider implements vscode.CodeActionProvider {
       return;
     }
 
-    const hasSlang = checkForSlangPackage();
+    const hasSlang = await checkForSlangPackage();
     if (!hasSlang) {
       return;
     }

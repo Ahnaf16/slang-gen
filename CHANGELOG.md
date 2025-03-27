@@ -13,3 +13,7 @@ All notable changes to the "slang-gen" extension will be documented in this file
 ## [0.0.3]
 
 - updated icon
+
+## [0.0.4]
+
+- fix showing code action even when slang is not present
