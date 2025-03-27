@@ -50,9 +50,8 @@ export async function hasDependency(
 
     if (dependencies[dependency]) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     logToOut(`Error reading or parsing pubspec.yaml:\n${error}`);
     return false;
@@ -63,14 +62,12 @@ export async function checkForSlangPackage(): Promise<boolean> {
   const {exists, pubPath} = await hasPubspec();
 
   if (!exists) {
-    showError("pubspec.yaml file not found.");
     return false;
   }
   const hasSlang = await hasDependency(pubPath, "slang");
   if (hasSlang) {
     return true;
   } else {
-    showError("Slang package is not found in dependencies.");
     return false;
   }
 }

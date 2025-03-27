@@ -17,3 +17,7 @@ All notable changes to the "slang-gen" extension will be documented in this file
 ## [0.0.4]
 
 - fix showing code action even when slang is not present
+  
+## [0.0.5]
+
+- remove error message when slang is not present
